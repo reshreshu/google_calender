@@ -5,7 +5,7 @@ import DayCell from "./DayCell";
 import eventsData from "../data/events.json";
 import AddEventModal from "./AddEventModal";
 import Sidebar from "./Sidebar";
-import { FiSearch } from "react-icons/fi"; // Search icon
+import { FiSearch } from "react-icons/fi";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -18,6 +18,7 @@ export default function Calendar() {
   const [addEventOpen, setAddEventOpen] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const [customEvents, setCustomEvents] = useState(() => {
     const saved = localStorage.getItem("events");
@@ -42,6 +43,10 @@ export default function Calendar() {
 
   const changeMonth = (amount) => {
     setCurrentDate(currentDate.add(amount, "month"));
+  };
+
+  const changeYear = (year) => {
+    setCurrentDate(currentDate.year(year));
   };
 
   let displayedDays = [];
@@ -95,6 +100,17 @@ export default function Calendar() {
 
   return (
     <div className={`flex min-h-screen ${dark ? "dark" : ""}`}>
+      {/* 📱 Mobile Hamburger */}
+      <div className="sm:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setShowSidebar(true)}
+          className="text-xl bg-gray-200 p-2 rounded dark:bg-gray-700"
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* Sidebar */}
       <Sidebar
         dark={dark}
         setDark={setDark}
@@ -107,18 +123,22 @@ export default function Calendar() {
         showEventDaysOnly={showEventDaysOnly}
         setShowEventDaysOnly={setShowEventDaysOnly}
         setAddEventOpen={setAddEventOpen}
+        onCloseMobile={() => setShowSidebar(false)}
+        isMobileOpen={showSidebar}
       />
 
+      {/* Calendar */}
       <main className="flex-1 p-4 overflow-auto bg-gray-100 dark:bg-gray-900 text-black dark:text-white">
         <div className="flex justify-center mb-4">
           <Header
             date={currentDate}
             onPrev={() => changeMonth(-1)}
             onNext={() => changeMonth(1)}
+            onYearChange={changeYear}
           />
         </div>
 
-        {/* 🔍 Search Input */}
+        {/* 🔍 Search */}
         <div className="relative w-full max-w-md mx-auto mb-4">
           <input
             type="text"
@@ -130,11 +150,13 @@ export default function Calendar() {
           <FiSearch className="absolute left-3 top-2.5 text-gray-500" />
         </div>
 
+        {/* Grid */}
         <div className="grid grid-cols-7 gap-2 mt-4">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div key={day} className="text-center font-bold">{day}</div>
+            <div key={day} className="text-center font-bold">
+              {day}
+            </div>
           ))}
-
           {displayedDays.map((day, index) => (
             <DayCell
               key={index}
@@ -149,6 +171,7 @@ export default function Calendar() {
           ))}
         </div>
 
+        {/* Event Details Modal */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded shadow w-96">
@@ -156,7 +179,12 @@ export default function Calendar() {
                 <h2 className="text-lg font-semibold">
                   Events on {selectedDate?.format("DD MMM YYYY")}
                 </h2>
-                <button onClick={() => setModalOpen(false)} className="text-red-500 font-bold">X</button>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="text-red-500 font-bold"
+                >
+                  X
+                </button>
               </div>
 
               {filteredEvents(selectedDate).map((e) => (
@@ -166,17 +194,29 @@ export default function Calendar() {
                   style={{ backgroundColor: e.color }}
                 >
                   <div>
-                    <strong>{e.title}</strong><br />
+                    <strong>{e.title}</strong>
+                    <br />
                     {e.startTime} – {e.endTime}
                   </div>
                   {customEvents.find((ce) => ce.id === e.id) && (
                     <div className="flex gap-1 ml-2">
-                      <button onClick={() => editEvent(e)} className="text-xs px-2 py-1 bg-yellow-400 text-black rounded">Edit</button>
-                      <button onClick={() => deleteEvent(e.id)} className="text-xs px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                      <button
+                        onClick={() => editEvent(e)}
+                        className="text-xs px-2 py-1 bg-yellow-400 text-black rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteEvent(e.id)}
+                        className="text-xs px-2 py-1 bg-red-500 text-white rounded"
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </div>
               ))}
+
               {filteredEvents(selectedDate).length === 0 && (
                 <p className="text-sm text-gray-500">No events.</p>
               )}
@@ -184,6 +224,7 @@ export default function Calendar() {
           </div>
         )}
 
+        {/* Add/Edit Modal */}
         {addEventOpen && (
           <AddEventModal
             onClose={() => {
