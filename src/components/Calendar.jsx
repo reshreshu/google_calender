@@ -11,7 +11,7 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [selectedType, setSelectedType] = useState("all");
   const [viewMode, setViewMode] = useState("month");
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [showEventDaysOnly, setShowEventDaysOnly] = useState(false);

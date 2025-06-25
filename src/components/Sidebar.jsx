@@ -15,7 +15,6 @@ export default function Sidebar({
   setShowEventDaysOnly,
   setAddEventOpen,
   onCloseMobile,
-  isMobileOpen,
 }) {
   const today = dayjs();
   const startOfMonth = currentDate.startOf("month");
@@ -27,17 +26,10 @@ export default function Sidebar({
   }
 
   return (
-    <aside
-      className={`w-72 bg-white dark:bg-gray-800 border-r dark:border-gray-700 p-4 flex flex-col gap-8
-        fixed sm:static top-0 left-0 h-full z-50 shadow-lg transition-transform
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0 sm:block`}
-    >
-      {/* 🛑 Close icon only on mobile */}
-      <div className="flex justify-end sm:hidden mb-2">
-        <button
-          onClick={onCloseMobile}
-          className="text-gray-700 dark:text-gray-200 text-lg"
-        >
+    <aside className="w-72 bg-white dark:bg-gray-800 border-r dark:border-gray-700 p-4 flex flex-col justify-between min-h-screen fixed sm:static top-0 left-0 z-50 shadow-lg sm:shadow-none transition-transform sm:translate-x-0 translate-x-0 sm:block">
+      {/* ❌ Mobile Close */}
+      <div className="flex justify-end sm:hidden">
+        <button onClick={onCloseMobile} className="text-gray-700 dark:text-gray-200 text-lg">
           <FiX />
         </button>
       </div>
@@ -45,19 +37,15 @@ export default function Sidebar({
       {/* 🗓️ Mini Calendar */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <button
-            onClick={() => setCurrentDate(currentDate.subtract(1, "month"))}
-            className="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-          >
+          <button onClick={() => setCurrentDate(currentDate.subtract(1, "month"))}
+            className="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
             <FiChevronLeft />
           </button>
           <h2 className="font-semibold text-center text-gray-700 dark:text-gray-200">
             {currentDate.format("MMMM YYYY")}
           </h2>
-          <button
-            onClick={() => setCurrentDate(currentDate.add(1, "month"))}
-            className="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-          >
+          <button onClick={() => setCurrentDate(currentDate.add(1, "month"))}
+            className="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
             <FiChevronRight />
           </button>
         </div>
@@ -69,12 +57,10 @@ export default function Sidebar({
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-xs text-center">
-          {Array(startOfMonth.day())
-            .fill("")
-            .map((_, i) => (
-              <div key={`empty-${i}`}></div>
-            ))}
-          {daysInMonth.map((day) => (
+          {Array(startOfMonth.day()).fill("").map((_, i) => (
+            <div key={`empty-${i}`}></div>
+          ))}
+          {daysInMonth.map((day, i) => (
             <div
               key={day.format("YYYY-MM-DD")}
               onClick={() => setCurrentDate(day)}
@@ -90,8 +76,8 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* 🎛️ Controls */}
-      <div className="flex flex-col gap-4 text-sm">
+      {/* 🎛️ Filters & Controls */}
+      <div className="flex flex-col space-y-3 text-sm mt-6">
         <select
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value)}
@@ -130,6 +116,12 @@ export default function Sidebar({
         >
           {dark ? "☀ Light Mode" : "🌙 Dark Mode"}
         </button>
+      </div>
+
+      {/* 📢 Slogan */}
+      <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
+        <p>📅 <strong>Survey Sparrow</strong></p>
+        <p className="italic">Plan Better. Work Smarter.</p>
       </div>
     </aside>
   );
